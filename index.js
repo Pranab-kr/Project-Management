@@ -1,5 +1,5 @@
 import "dotenv/config";
 
-console.log("hello");
+console.log("hello world");
 
 console.log(process.env.USERNAME);
