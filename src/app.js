@@ -16,8 +16,13 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
+//impoprt the routes
+import healthCheckRouteer from "./routes/helthcheck.routes.js";
+
+app.use("/api/v1/health-check" , healthCheckRouteer);
+
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  res.json({ message: "Project Management API is running" });
 });
 
 export default app;
