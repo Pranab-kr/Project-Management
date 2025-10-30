@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import bcrypt from "bcrypt";
+import bcrypt, { compare } from "bcrypt";
 
 const userSchema = new Schema(
   {
@@ -52,13 +52,19 @@ const userSchema = new Schema(
   { timestamps: true },
 );
 
+//hash password before saving hook
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
   }
-  // const salt = await bcrypt.genSalt(10);
+
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
+
+//compare password method attached to user schema
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 export const User = model("User", userSchema);
