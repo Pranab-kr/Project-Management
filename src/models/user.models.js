@@ -86,15 +86,15 @@ userSchema.methods.generateRefreshToken = function () {
 };
 
 userSchema.methods.generateTemporaryToken = function () {
-  const token = randomBytes(20).toString("hex");
+  const unhashedToken = randomBytes(20).toString("hex");
 
-  this.emailVerificationToken = createHmac("sha256", process.env.ACCESS_TOKEN_SECRET)
-    .update(token)
+  const hashedToken = createHmac("sha256")
+    .update(unhashedToken)
     .digest("hex");
 
-  this.emailVerificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  const tokenExpiry = Date.now() + 24 * 60 * 1000; // 20 min
 
-  return token;
-}
+  return { unhashedToken, hashedToken, tokenExpiry };
+};
 
 export const User = model("User", userSchema);
