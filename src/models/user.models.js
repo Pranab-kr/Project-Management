@@ -1,9 +1,11 @@
 import { Schema, model } from "mongoose";
 import bcrypt, { compare } from "bcrypt";
+import jwt from "jsonwebtoken";
+import { createHmac, randomBytes } from "crypto";
 
 const userSchema = new Schema(
   {
-    avater: {
+    avatar: {
       type: {
         url: String,
         localpath: String,
@@ -66,5 +68,33 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
+
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    { userId: this._id, email: this.email, username: this.username },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN },
+  );
+};
+
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    { userId: this._id, email: this.email, username: this.username },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN },
+  );
+};
+
+userSchema.methods.generateTemporaryToken = function () {
+  const token = randomBytes(20).toString("hex");
+
+  this.emailVerificationToken = createHmac("sha256", process.env.ACCESS_TOKEN_SECRET)
+    .update(token)
+    .digest("hex");
+
+  this.emailVerificationExpiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+
+  return token;
+}
 
 export const User = model("User", userSchema);
