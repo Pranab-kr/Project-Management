@@ -9,6 +9,7 @@ const sendEmail = async (options) => {
       link: "https://yourprojectmanagementtool.com/",
     },
   });
+
   const emailTextual = mailGenerator.generatePlaintext(options.mailgenContent);
 
   const emailHTML = mailGenerator.generate(options.mailgenContent);
@@ -21,7 +22,7 @@ const sendEmail = async (options) => {
       pass: process.env.MAILTRAP_SMTP_PASS,
     },
   });
-
+  12121;
   const mail = {
     from: "test@example.com",
     to: options.to,
