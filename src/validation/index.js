@@ -26,3 +26,16 @@ export const userRegisterationValidation = () => {
       .withMessage("password must be at least 6 characters long"),
   ];
 };
+
+export const userLoginValidation = () => {
+  return [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("email is required")
+      .isEmail()
+      .withMessage("invalid email format"),
+
+    body("password").trim().notEmpty().withMessage("password is required"),
+  ];
+};
