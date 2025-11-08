@@ -1,0 +1,28 @@
+import { body } from "express-validator";
+
+export const userRegisterationValidation = () => {
+  return [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("email is required")
+      .isEmail()
+      .withMessage("invalid email format"),
+
+    body("username")
+      .trim()
+      .notEmpty()
+      .withMessage("username is required")
+      .isLowercase()
+      .withMessage("username must be lowercase")
+      .isLength({ min: 3 })
+      .withMessage("username must be at least 3 characters long"),
+
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("password is required")
+      .isLength({ min: 6 })
+      .withMessage("password must be at least 6 characters long"),
+  ];
+};
