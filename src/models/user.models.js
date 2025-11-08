@@ -9,8 +9,12 @@ const userSchema = new Schema(
       type: {
         url: String,
         localpath: String,
+
       },
-      default: "https://placehold.co/200x200",
+      default: {
+        url: "https://placehold.co/200x200",
+        localpath: "",
+      },
     },
     username: {
       type: String,
@@ -86,7 +90,7 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.generateTemporaryToken = function () {
   const unhashedToken = randomBytes(20).toString("hex");
 
-  const hashedToken = createHmac("sha256").update(unhashedToken).digest("hex");
+  const hashedToken = createHmac("sha256", process.env.HMAC_SECRET).update(unhashedToken).digest("hex");
 
   const tokenExpiry = Date.now() + 20 * 60 * 1000; // 20 minutes
 

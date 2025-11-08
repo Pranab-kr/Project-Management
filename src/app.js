@@ -1,5 +1,8 @@
 import express from "express";
 import cors from "cors";
+//import the routes
+import healthCheckRouteer from "./routes/helthcheck.routes.js";
+import authRouter from "./routes/auth.routes.js";
 
 const app = express();
 
@@ -16,11 +19,12 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
-//impoprt the routes
-import healthCheckRouteer from "./routes/helthcheck.routes.js";
 
 app.use("/api/v1/health-check" , healthCheckRouteer);
 
+app.use("/api/v1/auth" , authRouter);
+
+//default route
 app.get("/", (req, res) => {
   res.json({ message: "Project Management API is running" });
 });

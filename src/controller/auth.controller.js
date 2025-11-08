@@ -2,7 +2,7 @@ import { User } from "../models/user.models.js";
 import { ApiResponce } from "../utils/api-responce.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
-import { sendEmail } from "../utils/mail.js";
+import { sendEmail, emailVerificationContent } from "../utils/mail.js";
 
 const generateRefreshAndAccessToken = async (userid) => {
   try {
@@ -15,7 +15,6 @@ const generateRefreshAndAccessToken = async (userid) => {
     await user.save({ validateBeforeSave: false });
 
     return { accessToken, refreshToken };
-
   } catch (error) {
     throw new ApiError(500, "Failed to generate tokens");
   }
@@ -52,9 +51,8 @@ const registeruser = asyncHandler(async (req, res) => {
     subject: "Verify your email",
     mailgenContent: emailVerificationContent(
       user.username,
-      `${request.protocol}://${request.get("host")}/api/v1/users/auth/verify-email/${unhashedToken}`,
+      `${req.protocol}://${req.get("host")}/api/v1/users/auth/verify-email/${unhashedToken}`,
     ),
-    text: `Your verification token is ${unhashedToken}. It will expire in 20 minutes.`,
   });
 
   const createdUser = await User.findById(user._id).select(
@@ -76,4 +74,4 @@ const registeruser = asyncHandler(async (req, res) => {
     );
 });
 
-export {registeruser}
+export { registeruser };
