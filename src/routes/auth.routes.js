@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { loginUser, registeruser } from "../controller/auth.controller.js";
+import { loginUser, registeruser, logOutUser } from "../controller/auth.controller.js";
 import {
   userLoginValidation,
   userRegisterationValidation,
 } from "../validation/index.js";
 import { validateRequest } from "../middlewares/validator.middleware.js";
+import { ensureAuth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -16,5 +17,8 @@ router.post(
 );
 
 router.post("/login", userLoginValidation(), validateRequest, loginUser);
+
+//sequre route for logout
+router.post("/logout", ensureAuth, logOutUser);
 
 export default router;

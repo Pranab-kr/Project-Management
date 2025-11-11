@@ -5,42 +5,33 @@ import { asyncHandler } from "../utils/async-handler.js";
 
 export const authMiddleware = asyncHandler(async (req, res, next) => {
   try {
-    const authToken = req.cookies?.accessToken || req.headers["authorization"];
+    let authToken = req.cookies?.accessToken || req.headers["authorization"]; // 👈 use let
 
-    if (!authToken) {
-      return next();
+    if (!authToken) return next();
+
+    if (authToken.startsWith("Bearer ")) {
+      authToken = authToken.split(" ")[1];
     }
 
-    if (!authToken.startsWith("Bearer ")) {
-      return new ApiError(400, "auth  header must start with Bearer");
-    }
-
-    const token = authToken.split(" ")[1];
-
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET);
 
     const user = await User.findById(decoded?._id).select(
-      "-password -refreshTokens -__v -emailVerificationToken -emailVerificationExpiry",
+      "-password -refreshTokens -__v -emailVerificationToken -emailVerificationExpiry"
     );
 
-    if (!user) {
-      throw new ApiError(401, "User not found");
-    }
+    if (!user) return next(); // user deleted or invalid id → guest
 
     req.user = user;
-
     return next();
-
   } catch (error) {
-    throw new ApiError(401, "Invalid or expired token");
+    return next(); // invalid/expired token → guest
   }
 });
 
 
 export const ensureAuth = asyncHandler(async (req, res, next) => {
-
   if (!req.user) {
-    throw new ApiError(401, "Authentication required");
+    throw new ApiError(401, "Authentication required to access this resource");
   }
   next();
 });

@@ -102,7 +102,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const option = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production", // ❗ only secure in production
+    sameSite: "None",
   };
 
   return res
@@ -118,4 +119,23 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-export { registeruser, loginUser };
+const logOutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: { refreshTokens: null } },
+    { new: true },
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponce(200, {}, "User logged out successfully"));
+});
+
+export { registeruser, loginUser, logOutUser };

@@ -4,6 +4,7 @@ import cors from "cors";
 import healthCheckRouteer from "./routes/helthcheck.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
+import { authMiddleware } from "./middlewares/auth.middleware.js";
 
 const app = express();
 
@@ -12,6 +13,9 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
+
+
+app.use(authMiddleware);
 
 //cors config
 app.use(
