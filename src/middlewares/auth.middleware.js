@@ -3,11 +3,12 @@ import { User } from "../models/user.models.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 
-export const authMiddleware = asyncHandler(async (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   try {
-    let authToken = req.cookies?.accessToken || req.headers["authorization"]; // 👈 use let
-
-    if (!authToken) return next();
+    let authToken = req.cookies?.accessToken || req.headers["authorization"];
+    if (!authToken) {
+      return next();
+    }
 
     if (authToken.startsWith("Bearer ")) {
       authToken = authToken.split(" ")[1];
@@ -16,18 +17,19 @@ export const authMiddleware = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(authToken, process.env.ACCESS_TOKEN_SECRET);
 
     const user = await User.findById(decoded?._id).select(
-      "-password -refreshTokens -__v -emailVerificationToken -emailVerificationExpiry"
+      "-password -refreshTokens -__v -emailVerificationToken -emailVerificationExpiry",
     );
 
-    if (!user) return next(); // user deleted or invalid id → guest
+    if (!user) {
+      return next();
+    }
 
     req.user = user;
-    return next();
+    next();
   } catch (error) {
-    return next(); // invalid/expired token → guest
+    next();
   }
-});
-
+};
 
 export const ensureAuth = asyncHandler(async (req, res, next) => {
   if (!req.user) {
