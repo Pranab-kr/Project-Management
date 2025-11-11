@@ -9,7 +9,6 @@ const userSchema = new Schema(
       type: {
         url: String,
         localpath: String,
-
       },
       default: {
         url: "https://placehold.co/200x200",
@@ -75,7 +74,11 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
-    { _id: this._id, email: this.email, username: this.username },
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+    },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN },
   );
@@ -90,7 +93,9 @@ userSchema.methods.generateRefreshToken = function () {
 userSchema.methods.generateTemporaryToken = function () {
   const unhashedToken = randomBytes(20).toString("hex");
 
-  const hashedToken = createHmac("sha256", process.env.HMAC_SECRET).update(unhashedToken).digest("hex");
+  const hashedToken = createHmac("sha256", process.env.HMAC_SECRET)
+    .update(unhashedToken)
+    .digest("hex");
 
   const tokenExpiry = Date.now() + 20 * 60 * 1000; // 20 minutes
 
