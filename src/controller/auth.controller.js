@@ -270,6 +270,7 @@ const refreashAccessToken = asyncHandler(async (req, res) => {
   throw new ApiError(401, "Invalid refresh token");
 });
 
+//forgot password controller
 const forgotPasswordRequest = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -305,6 +306,65 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "Password reset email sent"));
 });
 
+//reset forgot password controller
+const resetForgotPassword = asyncHandler(async (req, res) => {
+  const { resetToken } = req.params;
+  const { newPassword } = req.body;
+
+  if (!resetToken) {
+    throw new ApiError(400, "Invalid or missing token");
+  }
+
+  if (!newPassword) {
+    throw new ApiError(400, "New password is required");
+  }
+
+  const hashedToken = createHmac("sha256", process.env.HMAC_SECRET)
+    .update(resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    forgotPasswordToken: hashedToken,
+    forgotPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json(new ApiError(400, "Invalid or expired token"));
+  }
+
+  user.password = newPassword;
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+  await user.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, {}, "Password reset successfully"));
+});
+
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    throw new ApiError(400, "Both current and new passwords are required");
+  }
+
+  const user = await User.findById(req.user._id);
+
+  const isPasswordValid = await user.comparePassword(currentPassword);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Current password is incorrect");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: true });
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, {}, "Password changed successfully"));
+});
+
 export {
   registeruser,
   loginUser,
@@ -314,4 +374,5 @@ export {
   resendVerificationEmail,
   refreashAccessToken,
   forgotPasswordRequest,
+  resetForgotPassword,
 };
