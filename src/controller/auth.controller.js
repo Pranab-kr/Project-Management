@@ -10,6 +10,7 @@ import {
 import { createHmac } from "crypto";
 import jwt from "jsonwebtoken";
 
+//generate refresh and access token methods
 const generateRefreshAndAccessToken = async (userid) => {
   try {
     const user = await User.findById(userid);
@@ -26,6 +27,7 @@ const generateRefreshAndAccessToken = async (userid) => {
   }
 };
 
+//registerUser controller
 const registeruser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -80,6 +82,7 @@ const registeruser = asyncHandler(async (req, res) => {
     );
 });
 
+//login user controller
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -124,6 +127,7 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
+//logOut user controller
 const logOutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
@@ -143,6 +147,7 @@ const logOutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "User logged out successfully"));
 });
 
+//get current user controller
 const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
@@ -155,6 +160,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
+//verify email controller
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.params;
 
@@ -184,6 +190,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "Email verified successfully"));
 });
 
+//resend verification email controller
 const resendVerificationEmail = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -221,6 +228,7 @@ const resendVerificationEmail = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "Verification email resent successfully"));
 });
 
+//refresh access token controller
 const refreashAccessToken = asyncHandler(async (req, res) => {
   try {
     const incomingRefreshToken =
@@ -270,7 +278,7 @@ const refreashAccessToken = asyncHandler(async (req, res) => {
   throw new ApiError(401, "Invalid refresh token");
 });
 
-//forgot password controller
+//forgot password Request controller
 const forgotPasswordRequest = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -342,6 +350,7 @@ const resetForgotPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "Password reset successfully"));
 });
 
+//change current password controller
 const changeCurrentPassword = asyncHandler(async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 

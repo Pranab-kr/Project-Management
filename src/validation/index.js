@@ -39,3 +39,39 @@ export const userLoginValidation = () => {
     body("password").trim().notEmpty().withMessage("password is required"),
   ];
 };
+
+
+export const userchangeCurrentPasswordValidation = () => {
+  return [
+    body("oldPassword").trim().notEmpty().withMessage("old password is required"),
+
+    body("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("new password is required")
+      .isLength({ min: 6 })
+      .withMessage("new password must be at least 6 characters long"),
+  ];
+};
+
+export const userForgotPasswordValidation = () => {
+  return [
+    body("email")
+      .trim()
+      .notEmpty()
+      .withMessage("email is required")
+      .isEmail()
+      .withMessage("invalid email format"),
+  ];
+};
+
+export const userResetForgotPasswordValidation = () => {
+  return [
+    body("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("new password is required")
+      .isLength({ min: 6 })
+      .withMessage("new password must be at least 6 characters long"),
+  ];
+};
