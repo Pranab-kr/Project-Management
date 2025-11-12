@@ -33,7 +33,7 @@ router.post(
 
 router.post("/login", userLoginValidation(), validateRequest, loginUser);
 
-router.post("verify-email/:token", verifyEmail);
+router.post("/verify-email/:token", verifyEmail);
 
 router.post("/refresh-token", refreashAccessToken);
 
@@ -45,7 +45,7 @@ router.post(
 );
 
 router.post(
-  "/reset-password/:token",
+  "/reset-password/:resetToken",
   userResetForgotPasswordValidation(),
   validateRequest,
   resetForgotPassword,

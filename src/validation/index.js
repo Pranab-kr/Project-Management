@@ -40,10 +40,12 @@ export const userLoginValidation = () => {
   ];
 };
 
-
 export const userchangeCurrentPasswordValidation = () => {
   return [
-    body("oldPassword").trim().notEmpty().withMessage("old password is required"),
+    body("currentPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("old password is required"),
 
     body("newPassword")
       .trim()
