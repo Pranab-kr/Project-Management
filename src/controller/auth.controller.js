@@ -3,6 +3,7 @@ import { ApiResponce } from "../utils/api-responce.js";
 import { ApiError } from "../utils/api-error.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { sendEmail, emailVerificationContent } from "../utils/mail.js";
+import { createHmac } from "crypto";
 
 const generateRefreshAndAccessToken = async (userid) => {
   try {
@@ -138,4 +139,45 @@ const logOutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "User logged out successfully"));
 });
 
-export { registeruser, loginUser, logOutUser };
+const getCurrentUser = asyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(
+      new ApiResponce(
+        200,
+        { user: req.user },
+        "Current user fetched successfully",
+      ),
+    );
+});
+
+const verifyEmail = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+
+  if (!token) {
+    throw new ApiError(400, "Invalid or missing token");
+  }
+
+  const hashedToken = createHmac("sha256", process.env.HMAC_SECRET)
+    .update(token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json(new ApiError(400, "Invalid or expired token"));
+  }
+  user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpiry = undefined;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, {}, "Email verified successfully"));
+});
+
+export { registeruser, loginUser, logOutUser, verifyEmail };
