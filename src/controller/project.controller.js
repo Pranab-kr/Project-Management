@@ -50,7 +50,22 @@ const getUserProjects = asyncHandler(async (req, res) => {
 
 // TODO: Implement remaining controllers
 const getProjectById = asyncHandler(async (req, res) => {
-  // Implementation needed
+  const { projectId } = req.params;
+
+  const project = await Project.findById(projectId)
+    .populate("owner", "username email avatar")
+    .populate("members.user", "username email avatar")
+    .select("-__v");
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, project, "Project fetched successfully"));
+
+
 });
 
 const updateProject = asyncHandler(async (req, res) => {
