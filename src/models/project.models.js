@@ -1,5 +1,8 @@
 import { Schema, model } from "mongoose";
 import { AvailableUserRoles } from "../utils/constants.js";
+import { Task } from "./task.models.js";
+import { Note } from "./note.models.js";
+import { SubTask } from "./subtask.models.js";
 
 const projectMemberSchema = new Schema({
   user: {
@@ -38,5 +41,17 @@ const projectSchema = new Schema(
   },
   { timestamps: true }
 );
+
+projectSchema.pre("remove", async function (next) {
+  const projectId = this._id;
+
+  await Task.deleteMany({ project: projectId });
+  await Note.deleteMany({ project: projectId });
+  // Also delete subtasks if needed:
+  await SubTask.deleteMany({ task: { $in: tasksIds } });
+
+  next();
+});
+
 
 export const Project = model("Project", projectSchema);
