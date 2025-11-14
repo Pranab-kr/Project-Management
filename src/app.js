@@ -5,6 +5,7 @@ import healthCheckRouteer from "./routes/helthcheck.routes.js";
 import authRouter from "./routes/auth.routes.js";
 import cookieParser from "cookie-parser";
 import { authMiddleware } from "./middlewares/auth.middleware.js";
+import projectRouter from "./routes/project.routes.js";
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.use(
 app.use("/api/v1/health-check", healthCheckRouteer);
 
 app.use("/api/v1/auth", authRouter);
+
+app.use("/api/v1/projects", projectRouter);
 
 //default route
 app.get("/", (req, res) => {
