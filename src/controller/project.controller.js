@@ -48,7 +48,7 @@ const getUserProjects = asyncHandler(async (req, res) => {
     );
 });
 
-// TODO: Implement remaining controllers
+// Get project by ID
 const getProjectById = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
@@ -64,12 +64,30 @@ const getProjectById = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponce(200, project, "Project fetched successfully"));
-
-
 });
 
 const updateProject = asyncHandler(async (req, res) => {
-  // Implementation needed
+  const { projectId } = req.params;
+  const { name, description } = req.body;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  // if (project.owner.toString() !== req.user._id.toString()) {
+  //   throw new ApiError(403, "You are not authorized to update this project");
+  // }
+
+  project.name = name || project.name;
+  project.description = description || project.description;
+
+  await project.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, project, "Project updated successfully"));
 });
 
 const deleteProject = asyncHandler(async (req, res) => {
