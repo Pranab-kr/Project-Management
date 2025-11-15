@@ -90,6 +90,7 @@ const updateProject = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, project, "Project updated successfully"));
 });
 
+//delete project controller by id
 const deleteProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
@@ -107,7 +108,33 @@ const deleteProject = asyncHandler(async (req, res) => {
 });
 
 const addMember = asyncHandler(async (req, res) => {
-  // Implementation needed
+  const {projectId} = req.params;
+  const {userId, role} = req.body;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const isAlreadyMember = project.members.some(
+    (member) => member.user.toString() === userId
+  );
+  if (isAlreadyMember) {
+    throw new ApiError(400, "User is already a member of the project");
+  }
+
+  project.members.push({ user: userId, role: role || "member" });
+  await project.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, project, "Member added successfully"));
 });
 
 const getProjectMembers = asyncHandler(async (req, res) => {
