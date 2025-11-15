@@ -66,6 +66,7 @@ const getProjectById = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, project, "Project fetched successfully"));
 });
 
+//update project controller by id
 const updateProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
   const { name, description } = req.body;
@@ -107,6 +108,7 @@ const deleteProject = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, null, "Project deleted successfully"));
 });
 
+//add member to project controller
 const addMember = asyncHandler(async (req, res) => {
   const {projectId} = req.params;
   const {userId, role} = req.body;
@@ -137,6 +139,7 @@ const addMember = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, project, "Member added successfully"));
 });
 
+//get project members controller
 const getProjectMembers = asyncHandler(async (req, res) => {
   const {projectId} = req.params;
 
@@ -160,12 +163,55 @@ const getProjectMembers = asyncHandler(async (req, res) => {
     );
 });
 
+//update member role controller
 const updateMemberRole = asyncHandler(async (req, res) => {
-  // Implementation needed
+  const {projectId, userId} = req.params;
+  const {role} = req.body;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const member = project.members.find(
+    (member) => member.user.toString() === userId
+  );
+  if (!member) {
+    throw new ApiError(404, "Member not found in the project");
+  }
+
+  member.role = role || member.role;
+  await project.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, project, "Member role updated successfully"));
 });
 
+//remove member from project controller
 const removeMember = asyncHandler(async (req, res) => {
-  // Implementation needed
+  const {projectId, userId} = req.params;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const memberIndex = project.members.findIndex(
+    (member) => member.user.toString() === userId
+  );
+  if (memberIndex === -1) {
+    throw new ApiError(404, "Member not found in the project");
+  }
+
+  project.members.splice(memberIndex, 1);
+  await project.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponce(200, project, "Member removed successfully"));
 });
 
 export {
