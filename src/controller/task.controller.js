@@ -108,6 +108,7 @@ const updateTask = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponce(200, "Task updated successfully", task));
 });
 
+//delete task
 const deleteTask = asyncHandler(async (req, res) => {
   const { projectId, taskId } = req.params;
 
@@ -121,7 +122,7 @@ const deleteTask = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Task not found");
   }
 
-  await task.remove();
+  await task.deleteOne();
 
   res.status(200).json(new ApiResponce(200, "Task deleted successfully"));
 });
@@ -155,6 +156,7 @@ const createSubTask = asyncHandler(async (req, res) => {
     .json(new ApiResponce(201, "Subtask created successfully", subTask));
 });
 
+//update subtask
 const updateSubTask = asyncHandler(async (req, res) => {
   const { projectId, taskId, subTaskId } = req.params;
   const { title, isCompleted, userId } = req.body;
@@ -185,6 +187,7 @@ const updateSubTask = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, "Subtask updated successfully", subTask));
 });
 
+//delete subtask
 const deleteSubTask = asyncHandler(async (req, res) => {
   const { projectId, taskId, subTaskId } = req.params;
 
@@ -203,7 +206,7 @@ const deleteSubTask = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Subtask not found");
   }
 
-  await subTask.remove();
+  await subTask.deleteOne();
 
   res.status(200).json(new ApiResponce(200, "Subtask deleted successfully"));
 });

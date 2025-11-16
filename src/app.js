@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { authMiddleware } from "./middlewares/auth.middleware.js";
 import projectRouter from "./routes/project.routes.js";
 import taskRouter from "./routes/task.routes.js";
+import noteRouter from "./routes/note.routes.js";
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/projects", projectRouter);
 
 app.use("/api/v1/tasks", taskRouter);
+
+app.use("/api/v1/notes", noteRouter);
 
 //default route
 app.get("/", (req, res) => {
