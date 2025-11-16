@@ -3,6 +3,7 @@ import { ApiResponce } from "../utils/api-responce.js ";
 import { Project } from "../models/project.models.js";
 import { Task } from "../models/task.moels.js";
 import { asyncHandler } from "../utils/async-handler.js";
+import { SubTask } from "../models/subTask.models.js";
 import { User } from "../models/user.models.js";
 
 //create task
@@ -124,3 +125,96 @@ const deleteTask = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponce(200, "Task deleted successfully"));
 });
+
+//subtask controllers
+//create subtask
+const createSubTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+  const { title, isCompleted } = req.body;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const subTask = new SubTask({
+    title,
+    isCompleted,
+    task: taskId,
+  });
+
+  await subTask.save();
+
+  res
+    .status(201)
+    .json(new ApiResponce(201, "Subtask created successfully", subTask));
+});
+
+const updateSubTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId, subTaskId } = req.params;
+  const { title, isCompleted, userId } = req.body;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const subTask = await SubTask.findOne({ _id: subTaskId, task: taskId });
+  if (!subTask) {
+    throw new ApiError(404, "Subtask not found");
+  }
+
+  if (title) subTask.title = title;
+  if (isCompleted !== undefined) subTask.isCompleted = isCompleted;
+  if(userId) subTask.completedBy = userId;
+
+  await subTask.save();
+
+  res
+    .status(200)
+    .json(new ApiResponce(200, "Subtask updated successfully", subTask));
+});
+
+const deleteSubTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId, subTaskId } = req.params;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  const subTask = await SubTask.findOne({ _id: subTaskId, task: taskId });
+  if (!subTask) {
+    throw new ApiError(404, "Subtask not found");
+  }
+
+  await subTask.remove();
+
+  res.status(200).json(new ApiResponce(200, "Subtask deleted successfully"));
+});
+
+export {
+  createTask,
+  getProjectTasks,
+  getTaskById,
+  updateTask,
+  deleteTask,
+  createSubTask,
+  updateSubTask,
+  deleteSubTask,
+};
