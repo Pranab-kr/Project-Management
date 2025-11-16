@@ -43,7 +43,6 @@ const createTask = asyncHandler(async (req, res) => {
 const getProjectTasks = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  // Verify that the project exists
   const project = await Project.findById(projectId);
   if (!project) {
     throw new ApiError(404, "Project not found");
@@ -54,4 +53,74 @@ const getProjectTasks = asyncHandler(async (req, res) => {
   res
     .status(200)
     .json(new ApiResponce(200, "Project tasks fetched successfully", tasks));
+});
+
+const getTaskById = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  res.status(200).json(new ApiResponce(200, "Task fetched successfully", task));
+});
+
+//update task
+const updateTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+  const { title, description, assignedTo, status } = req.body;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  if (title) task.title = title;
+  if (description) task.description = description;
+  if (assignedTo) task.assignedTo = assignedTo;
+  if (status) task.status = status;
+
+  // for file attachments
+  if (req.files && req.files.length > 0) {
+    const newAttachments = req.files.map((file) => ({
+      url: `/uploads/${file.filename}`,
+      localPath: file.path,
+      mimetype: file.mimetype,
+      size: file.size,
+    }));
+    task.attachments.push(...newAttachments);
+  }
+
+  await task.save();
+
+  res.status(200).json(new ApiResponce(200, "Task updated successfully", task));
+});
+
+const deleteTask = asyncHandler(async (req, res) => {
+  const { projectId, taskId } = req.params;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const task = await Task.findOne({ _id: taskId, project: projectId });
+  if (!task) {
+    throw new ApiError(404, "Task not found");
+  }
+
+  await task.remove();
+
+  res.status(200).json(new ApiResponce(200, "Task deleted successfully"));
 });
