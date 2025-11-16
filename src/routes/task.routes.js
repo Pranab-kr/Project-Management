@@ -4,7 +4,7 @@ import {
   isProjectMember,
   canManageProject,
 } from "../middlewares/permission.middleware.js";
-import { upload } from "../middlewares/multer.middleware.js";
+import  upload  from "../middlewares/multer.middleware.js";
 import {
   createTask,
   getProjectTasks,
