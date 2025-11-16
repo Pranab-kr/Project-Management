@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import { AvailableUserRoles } from "../utils/constants.js";
 import { Task } from "./task.models.js";
 import { Note } from "./note.models.js";
-import { SubTask } from "./subtask.models.js";
+import { SubTask } from "./subTask.models.js";
 
 const projectMemberSchema = new Schema({
   user: {

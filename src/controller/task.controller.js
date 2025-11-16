@@ -1,7 +1,7 @@
 import { ApiError } from "../utils/api-error.js";
 import { ApiResponce } from "../utils/api-responce.js ";
 import { Project } from "../models/project.models.js";
-import { Task } from "../models/task.moels.js";
+import { Task } from "../models/task.models.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { SubTask } from "../models/subTask.models.js";
 import { User } from "../models/user.models.js";
@@ -27,7 +27,7 @@ const createTask = asyncHandler(async (req, res) => {
     status,
     attachments: req.files
       ? req.files.map((file) => ({
-          url: `/uploads/${file.filename}`,
+          url: `/images/${file.filename}`,
           localPath: file.path,
           mimetype: file.mimetype,
           size: file.size,
@@ -95,7 +95,7 @@ const updateTask = asyncHandler(async (req, res) => {
   // for file attachments
   if (req.files && req.files.length > 0) {
     const newAttachments = req.files.map((file) => ({
-      url: `/uploads/${file.filename}`,
+      url: `/images/${file.filename}`,
       localPath: file.path,
       mimetype: file.mimetype,
       size: file.size,
@@ -176,7 +176,7 @@ const updateSubTask = asyncHandler(async (req, res) => {
 
   if (title) subTask.title = title;
   if (isCompleted !== undefined) subTask.isCompleted = isCompleted;
-  if(userId) subTask.completedBy = userId;
+  if (userId) subTask.completedBy = userId;
 
   await subTask.save();
 
