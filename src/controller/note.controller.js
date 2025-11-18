@@ -4,6 +4,7 @@ import { ApiResponce } from "../utils/api-responce.js";
 import { Note } from "../models/note.models.js";
 import { Project } from "../models/project.models.js";
 
+//note controller
 // Create note
 const createNote = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
@@ -106,10 +107,4 @@ const deleteNote = asyncHandler(async (req, res) => {
     .json(new ApiResponce(200, {}, "Note deleted successfully"));
 });
 
-export {
-  createNote,
-  getProjectNotes,
-  getNoteById,
-  updateNote,
-  deleteNote,
-};
+export { createNote, getProjectNotes, getNoteById, updateNote, deleteNote };
