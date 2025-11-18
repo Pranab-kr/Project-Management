@@ -14,11 +14,6 @@ const createNote = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Title and content are required");
   }
 
-  const project = await Project.findById(projectId);
-  if (!project) {
-    throw new ApiError(404, "Project not found");
-  }
-
   const note = await Note.create({
     title,
     content,

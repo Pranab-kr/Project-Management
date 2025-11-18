@@ -20,7 +20,7 @@ router.use(ensureAuth);
 router.post("/:projectId", isProjectAdmin, createNote);
 router.get("/:projectId", isProjectMember, getProjectNotes);
 router.get("/:projectId/n/:noteId", isProjectMember, getNoteById);
-router.put("/:projectId/n/:noteId", isProjectAdmin, updateNote);
+router.patch("/:projectId/n/:noteId", isProjectAdmin, updateNote);
 router.delete("/:projectId/n/:noteId", isProjectAdmin, deleteNote);
 
 export default router;
