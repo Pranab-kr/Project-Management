@@ -110,8 +110,8 @@ const deleteProject = asyncHandler(async (req, res) => {
 
 //add member to project controller
 const addMember = asyncHandler(async (req, res) => {
-  const {projectId} = req.params;
-  const {userId, role} = req.body;
+  const { projectId } = req.params;
+  const { userId, role } = req.body;
 
   const project = await Project.findById(projectId);
 
@@ -125,7 +125,7 @@ const addMember = asyncHandler(async (req, res) => {
   }
 
   const isAlreadyMember = project.members.some(
-    (member) => member.user.toString() === userId
+    (member) => member.user.toString() === userId,
   );
   if (isAlreadyMember) {
     throw new ApiError(400, "User is already a member of the project");
@@ -141,11 +141,11 @@ const addMember = asyncHandler(async (req, res) => {
 
 //get project members controller
 const getProjectMembers = asyncHandler(async (req, res) => {
-  const {projectId} = req.params;
+  const { projectId } = req.params;
 
   const project = await Project.findById(projectId).populate(
     "members.user",
-    "username email avatar"
+    "username email avatar",
   );
 
   if (!project) {
@@ -165,8 +165,8 @@ const getProjectMembers = asyncHandler(async (req, res) => {
 
 //update member role controller
 const updateMemberRole = asyncHandler(async (req, res) => {
-  const {projectId, userId} = req.params;
-  const {role} = req.body;
+  const { projectId, userId } = req.params;
+  const { role } = req.body;
 
   const project = await Project.findById(projectId);
 
@@ -175,7 +175,7 @@ const updateMemberRole = asyncHandler(async (req, res) => {
   }
 
   const member = project.members.find(
-    (member) => member.user.toString() === userId
+    (member) => member.user.toString() === userId,
   );
   if (!member) {
     throw new ApiError(404, "Member not found in the project");
@@ -191,7 +191,7 @@ const updateMemberRole = asyncHandler(async (req, res) => {
 
 //remove member from project controller
 const removeMember = asyncHandler(async (req, res) => {
-  const {projectId, userId} = req.params;
+  const { projectId, userId } = req.params;
 
   const project = await Project.findById(projectId);
 
@@ -200,7 +200,7 @@ const removeMember = asyncHandler(async (req, res) => {
   }
 
   const memberIndex = project.members.findIndex(
-    (member) => member.user.toString() === userId
+    (member) => member.user.toString() === userId,
   );
   if (memberIndex === -1) {
     throw new ApiError(404, "Member not found in the project");

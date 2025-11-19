@@ -4,7 +4,7 @@ import {
   isProjectMember,
   canManageProject,
 } from "../middlewares/permission.middleware.js";
-import  upload  from "../middlewares/multer.middleware.js";
+import upload from "../middlewares/multer.middleware.js";
 import {
   createTask,
   getProjectTasks,
@@ -32,7 +32,7 @@ router.get("/:projectId", isProjectMember, getProjectTasks);
 
 router.get("/:projectId/t/:taskId", isProjectMember, getTaskById);
 
-router.put(
+router.patch(
   "/:projectId/t/:taskId",
   canManageProject,
   upload.array("attachments", 5),
@@ -43,7 +43,7 @@ router.delete("/:projectId/t/:taskId", canManageProject, deleteTask);
 
 // Subtask routes
 router.post("/:projectId/t/:taskId/subtasks", canManageProject, createSubTask);
-router.put("/:projectId/st/:subTaskId", isProjectMember, updateSubTask);
+router.patch("/:projectId/st/:subTaskId", isProjectMember, updateSubTask);
 router.delete("/:projectId/st/:subTaskId", canManageProject, deleteSubTask);
 
 export default router;
